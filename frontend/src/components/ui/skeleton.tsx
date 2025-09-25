@@ -11,3 +11,6 @@ function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 export { Skeleton };
+
+// Re-export all skeleton components for easy importing
+export * from "./skeleton";

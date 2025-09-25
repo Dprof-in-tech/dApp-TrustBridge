@@ -4,6 +4,7 @@ import LenderPoolPage from "@/components/modules/marketplace/ui/pages/LenderPool
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useRoleContext } from "@/providers/role.provider";
+import { LenderDashboardSkeleton } from "@/components/ui/skeleton/LenderDashboardSkeleton";
 
 
 export default function LenderMarketplace() {
@@ -22,26 +23,12 @@ export default function LenderMarketplace() {
 
   // Show loading while checking role
   if (!role) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="loader mb-4"></div>
-          <p className="text-gray-400">Loading marketplace...</p>
-        </div>
-      </div>
-    );
+    return <LenderDashboardSkeleton />;
   }
 
   // Show loading while redirecting
   if (role !== "lender") {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="loader mb-4"></div>
-          <p className="text-gray-400">Redirecting to your marketplace...</p>
-        </div>
-      </div>
-    );
+    return <LenderDashboardSkeleton />;
   }
 
 

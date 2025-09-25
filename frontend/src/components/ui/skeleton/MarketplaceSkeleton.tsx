@@ -1,63 +1,12 @@
-"use client";
+import React from "react";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import RoleSelectionModal from "@/components/modules/marketplace/ui/components/RoleSelectionModal";
-import { useRoleContext } from "@/providers/role.provider";
-import { MarketplaceSkeleton } from "@/components/ui/skeleton/MarketplaceSkeleton";
+interface MarketplaceSkeletonProps {
+  className?: string;
+}
 
-
-export default function MarketplaceEntry() {
-  const { role, setRole } = useRoleContext();
-  const [modalOpen, setModalOpen] = useState(false);
-  const [hasShownModal, setHasShownModal] = useState(false);
-  const router = useRouter();
-
-  // Show modal only once when component mounts
-  useEffect(() => {
-    if (!hasShownModal) {
-      setModalOpen(true);
-      setHasShownModal(true);
-    }
-  }, [hasShownModal]);
-
-  // Get the last selected role from localStorage as fallback
-
-  const getLastSelectedRole = (): "borrower" | "lender" => {
-    if (typeof window !== "undefined") {
-      const savedRole = localStorage.getItem("user-role") as
-        | "borrower"
-        | "lender"
-
-        | null;
-      return savedRole && (savedRole === "lender" || savedRole === "borrower")
-        ? savedRole
-        : "lender";
-    }
-    return "lender";
-  };
-
-  const handleRoleSelect = (selectedRole: "lender" | "borrower") => {
-    setRole(selectedRole);
-    setModalOpen(false);
-    router.push(`/dashboard/marketplace/${selectedRole}`);
-  };
-
-  const handleCloseModal = () => {
-    setModalOpen(false);
-
-    // If user closes modal without selecting, redirect to borrower by default
-    if (!role) {
-      setRole("borrower");
-      router.push("/dashboard/marketplace/borrower");
-
-    } else {
-      router.push(`/dashboard/marketplace/${role}`);
-    }
-  };
-
+export function MarketplaceSkeleton({ className = "" }: MarketplaceSkeletonProps) {
   return (
-    <main className="container mx-auto px-4 md:px-6 pt-24 pb-16 max-w-6xl">
+    <main className={`container mx-auto px-4 md:px-6 pt-24 pb-16 max-w-6xl ${className}`}>
       <div className="space-y-8">
         {/* Header Skeleton */}
         <div className="space-y-2">
@@ -96,12 +45,20 @@ export default function MarketplaceEntry() {
             </div>
           </div>
           <div className="p-5">
+            {/* Tab skeleton */}
+            <div className="flex mb-4 space-x-4">
+              <div className="h-8 bg-neutral-800 rounded w-32 animate-pulse"></div>
+              <div className="h-8 bg-neutral-700 rounded w-20 animate-pulse"></div>
+              <div className="h-8 bg-neutral-700 rounded w-16 animate-pulse"></div>
+            </div>
+            
             {/* Table Header */}
             <div className="flex space-x-4 mb-4">
               {["Asset", "Supplied", "Borrowed", "Supply APY", "Borrow APY", "Role"].map((_, i) => (
                 <div key={i} className="h-4 bg-neutral-800 rounded flex-1 animate-pulse"></div>
               ))}
             </div>
+            
             {/* Table Rows */}
             {Array.from({ length: 3 }).map((_, rowIndex) => (
               <div key={rowIndex} className="flex space-x-4 items-center mb-4">
@@ -111,15 +68,19 @@ export default function MarketplaceEntry() {
                 ))}
               </div>
             ))}
+
+            {/* Actions Section Skeleton */}
+            <div className="mt-6 border-t border-custom pt-6">
+              <div className="h-10 bg-neutral-800 rounded w-full mb-4 animate-pulse"></div>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="h-10 bg-neutral-700 rounded animate-pulse"></div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <RoleSelectionModal
-        isOpen={modalOpen}
-        onClose={handleCloseModal}
-        onRoleSelect={handleRoleSelect}
-        currentRole={getLastSelectedRole()}
-      />
     </main>
   );
 }

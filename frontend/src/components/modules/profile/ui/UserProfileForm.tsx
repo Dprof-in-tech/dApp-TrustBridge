@@ -8,6 +8,7 @@ import { useUserContext } from "@/providers/user.provider";
 import { useWalletContext } from "@/providers/wallet.provider";
 import { toast } from "sonner";
 import { profileSchema } from "../schemas/profile.schema";
+import { ProfileSkeleton } from "@/components/ui/skeleton/ProfileSkeleton";
 
 export default function Profile() {
   const { profile, loading, saving, saveProfile } = useUserContext();
@@ -59,13 +60,7 @@ export default function Profile() {
   };
 
   if (loading) {
-    return (
-      <main className="container mx-auto px-4 md:px-6 pt-24 pb-16 max-w-3xl">
-        <div className="flex items-center justify-center h-64">
-          <div className="loader"></div>
-        </div>
-      </main>
-    );
+    return <ProfileSkeleton />;
   }
 
   return (
@@ -211,7 +206,7 @@ export default function Profile() {
           >
             {saving ? (
               <>
-                <div className="loader mr-2"></div>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                 Saving...
               </>
             ) : (

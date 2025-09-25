@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import RoleSelectionModal from "@/components/modules/marketplace/ui/components/RoleSelectionModal";
 import { useRoleContext } from "@/providers/role.provider";
-import { MarketplaceSkeleton } from "@/components/ui/skeleton/MarketplaceSkeleton";
 
 
 export default function MarketplaceEntry() {

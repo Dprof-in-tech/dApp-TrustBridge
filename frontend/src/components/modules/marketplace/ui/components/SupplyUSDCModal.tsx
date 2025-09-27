@@ -2,6 +2,11 @@
 
 import { useSupply } from "../../hooks/useSupply.hook";
 import { useWalletBalance } from "@/components/modules/marketplace/hooks/useWalletBalance.hook";
+import { EnhancedForm } from "@/components/ui/form/EnhancedForm";
+import { AmountField } from "@/components/ui/form-field";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { X, DollarSign, ArrowRight, Percent, Shield, Info } from "lucide-react";
 
 interface SupplyUSDCModalProps {
   isOpen: boolean;
@@ -16,6 +21,7 @@ export function SupplyUSDCModal({
 }: SupplyUSDCModalProps) {
   const {
     balancesFormatted,
+    balances,
     loading: loadingBalances,
     refresh,
   } = useWalletBalance();
@@ -31,22 +37,38 @@ export function SupplyUSDCModal({
     isOpen,
     onClose,
     onSuccess: () => {
-      // existing behavior
       onSuccess?.();
-      refresh(); // re-fetch balances after confirmed tx
+      refresh();
     },
   });
+
+  const handleFormSubmit = async (data: any) => {
+    const { amount, useAsCollateral } = data;
+    setSupplyAmount(amount);
+
+    // Simulate the supply process with form data
+    await handleSupplyUSDC();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      onClose();
+    }
+  };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      onKeyDown={handleKeyDown}
+    >
       <div className="card bg-dark-secondary p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-green-900/30 rounded-lg">
-              <i className="fas fa-dollar-sign text-green-400 text-lg"></i>
+              <DollarSign className="text-green-400 h-5 w-5" />
             </div>
             <div>
               <h3 className="text-xl font-semibold text-neutral-100">
@@ -59,62 +81,66 @@ export function SupplyUSDCModal({
           </div>
           <button
             onClick={onClose}
-            className="text-neutral-400 hover:text-white"
+            className="text-neutral-400 hover:text-white transition-colors"
           >
-            <i className="fas fa-times"></i>
+            <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Amount Input */}
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-2">
-            <label htmlFor="supply-amount" className="text-sm text-neutral-300">
-              Amount to Supply
-            </label>
-            <span className="text-xs text-gray-500">
-              {loadingBalances
-                ? "Loading..."
-                : `Wallet Balance: ${balancesFormatted.USDC ?? "0"} USDC`}
-            </span>
-          </div>
-          <div className="relative">
-            <input
-              id="supply-amount"
-              type="number"
-              placeholder="0.00"
-              value={supplyAmount}
-              onChange={(e) => setSupplyAmount(e.target.value)}
-              className="w-full bg-neutral-800 border border-neutral-600 text-neutral-200 text-lg h-12 pr-16 px-4 rounded placeholder:text-neutral-500"
-              min="0"
-              step="0.01"
-              disabled={loading}
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-neutral-400">
-              USDC
-            </span>
-          </div>
+        {/* Enhanced Form */}
+        <EnhancedForm
+          onSubmit={handleFormSubmit}
+          submitText="Supply USDC"
+          loadingText="Processing Transaction..."
+          showProgress
+          disabled={loading || loadingBalances}
+        >
+          <AmountField
+            name="amount"
+            label="Amount to Supply"
+            asset="USDC"
+            balance={balances?.USDC ? parseFloat(balances.USDC) : undefined}
+            min={0.01}
+            precision={6}
+            showMaxButton
+            showQuickAmounts
+            quickAmounts={[25, 50, 100, 500]}
+            required
+            disabled={loading || loadingBalances}
+            validation={{
+              required: "Please enter an amount to supply",
+              custom: async (value: string) => {
+                const amount = parseFloat(value);
+                if (amount < 0.01) return "Minimum supply amount is 0.01 USDC";
+                if (balances?.USDC && amount > parseFloat(balances.USDC)) {
+                  return "Insufficient USDC balance";
+                }
+                return undefined;
+              },
+            }}
+          />
 
-          {/* Quick Amount Buttons */}
-          <div className="flex gap-2 mt-3">
-            {[25, 50, 100, 500].map((amount) => (
-              <button
-                key={amount}
-                onClick={() => setSupplyAmount(amount.toString())}
-                disabled={loading}
-                className="flex-1 border border-neutral-600 text-neutral-400 text-xs py-2 rounded hover:bg-neutral-800 hover:text-white"
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <Switch id="useAsCollateral" />
+              <Label
+                htmlFor="useAsCollateral"
+                className="text-sm text-neutral-300"
               >
-                ${amount}
-              </button>
-            ))}
+                Use as Collateral
+              </Label>
+            </div>
+            <p className="text-xs text-neutral-500">
+              Allow this deposit to be used as collateral for borrowing
+            </p>
           </div>
-        </div>
-
+        </EnhancedForm>
         {/* Transaction Preview */}
         {estimates.expectedBTokens > 0 && (
-          <div className="mb-6">
+          <div className="mb-6 mt-6">
             <div className="border-t border-neutral-700 pt-4 space-y-4">
               <h4 className="text-sm font-medium text-neutral-300 flex items-center gap-2">
-                <i className="fas fa-arrow-right"></i>
+                <ArrowRight className="h-4 w-4" />
                 Transaction Preview
               </h4>
 
@@ -140,7 +166,7 @@ export function SupplyUSDCModal({
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-neutral-800/50 border border-neutral-700 rounded p-3">
                   <div className="flex items-center gap-1 mb-1">
-                    <i className="fas fa-percentage text-green-400 text-xs"></i>
+                    <Percent className="text-green-400 h-3 w-3" />
                     <span className="text-xs text-neutral-400">Supply APY</span>
                   </div>
                   <div className="text-sm font-semibold text-green-400">
@@ -150,7 +176,7 @@ export function SupplyUSDCModal({
 
                 <div className="bg-neutral-800/50 border border-neutral-700 rounded p-3">
                   <div className="flex items-center gap-1 mb-1">
-                    <i className="fas fa-shield-alt text-blue-400 text-xs"></i>
+                    <Shield className="text-blue-400 h-3 w-3" />
                     <span className="text-xs text-neutral-400">
                       Health Factor
                     </span>
@@ -173,41 +199,13 @@ export function SupplyUSDCModal({
         {/* Info Alert */}
         <div className="bg-blue-900/20 border border-blue-700/50 text-blue-300 text-sm rounded p-3 mb-6">
           <div className="flex items-start gap-2">
-            <i className="fas fa-info-circle text-blue-400 mt-0.5"></i>
+            <Info className="text-blue-400 h-4 w-4 mt-0.5 shrink-0" />
             <p>
               <strong>About bUSDC:</strong> These tokens automatically earn
               yield and represent your share of the pool. You can redeem them
               anytime for USDC plus accrued interest.
             </p>
           </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-3">
-          <button
-            onClick={onClose}
-            disabled={loading}
-            className="flex-1 border border-neutral-600 text-neutral-300 py-2 rounded hover:bg-neutral-800"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSupplyUSDC}
-            disabled={isSupplyDisabled}
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded"
-          >
-            {loading ? (
-              <div className="flex items-center justify-center gap-2">
-                <div className="loader border-white border-t-transparent border-2 rounded-full w-4 h-4 animate-spin"></div>
-                Supplying...
-              </div>
-            ) : (
-              <div className="flex items-center justify-center gap-2">
-                <i className="fas fa-arrow-up"></i>
-                Supply USDC
-              </div>
-            )}
-          </button>
         </div>
       </div>
     </div>

@@ -1,51 +1,23 @@
 "use client";
 
 import React from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import type { z } from "zod";
+import { toast } from "sonner";
 import { useUserContext } from "@/providers/user.provider";
 import { useWalletContext } from "@/providers/wallet.provider";
-import { toast } from "sonner";
 import { profileSchema } from "../schemas/profile.schema";
+import { EnhancedForm } from "@/components/ui/form/EnhancedForm";
+import { FormField } from "@/components/ui/form/FormField";
+import { AddressField } from "@/components/ui/form-field";
+import { SelectField } from "@/components/ui/form-field";
+import { validationRules } from "@/lib/validation";
 
 export default function Profile() {
   const { profile, loading, saving, saveProfile } = useUserContext();
   const { walletAddress } = useWalletContext();
 
-  const form = useForm<z.infer<typeof profileSchema>>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      country: "",
-      phoneNumber: "",
-      walletAddress: "",
-    },
-  });
-
-  React.useEffect(() => {
-    if (profile) {
-      form.reset({
-        firstName: profile.firstName || "",
-        lastName: profile.lastName || "",
-        country: profile.country || "",
-        phoneNumber: profile.phoneNumber || "",
-        walletAddress: walletAddress || profile.walletAddress || "",
-      });
-    } else if (walletAddress) {
-      form.reset({
-        // Keep any potentially user-entered values if profile is null
-        ...form.getValues(),
-        walletAddress: walletAddress,
-      });
-    }
-  }, [profile, walletAddress, form]);
-
-  const onSubmit = async (data: z.infer<typeof profileSchema>) => {
+  const onSubmit = async (data: any) => {
     try {
       await saveProfile(data);
-      // No reload, context is updated by saveProfile
       toast.success("Profile updated successfully!");
     } catch (error) {
       toast.error("Failed to update profile. Please try again.");
@@ -53,10 +25,16 @@ export default function Profile() {
     }
   };
 
-  const handleSaveChanges = (e: React.FormEvent) => {
-    e.preventDefault();
-    form.handleSubmit(onSubmit)();
-  };
+  const countries = [
+    { value: "us", label: "United States" },
+    { value: "ca", label: "Canada" },
+    { value: "mx", label: "Mexico" },
+    { value: "uk", label: "United Kingdom" },
+    { value: "de", label: "Germany" },
+    { value: "fr", label: "France" },
+    { value: "jp", label: "Japan" },
+    { value: "au", label: "Australia" },
+  ];
 
   if (loading) {
     return (
@@ -75,154 +53,83 @@ export default function Profile() {
         Keep your information up-to-date for the best experience on TrustBridge.
       </p>
 
-      <form onSubmit={handleSaveChanges}>
-        <div className="card p-6 mb-8">
-          <h2 className="text-xl font-medium mb-4 border-b border-custom pb-3">
-            Personal Details
-          </h2>
+      <div className="card p-6 mb-8">
+        <h2 className="text-xl font-medium mb-4 border-b border-custom pb-3">
+          Personal Details
+        </h2>
+
+        {/* Enhanced Form */}
+        <EnhancedForm
+          onSubmit={onSubmit}
+          submitText="Save Changes"
+          loadingText="Saving..."
+          disabled={saving}
+          formOptions={{
+            defaultValues: {
+              firstName: profile?.firstName || "",
+              lastName: profile?.lastName || "",
+              country: profile?.country || "",
+              phoneNumber: profile?.phoneNumber || "",
+              walletAddress: walletAddress || profile?.walletAddress || "",
+            },
+          }}
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="first-name" className="form-label">
-                First Name
-              </label>
-              <input
-                type="text"
-                id="first-name"
-                className="form-input"
-                placeholder="Enter your first name"
-                {...form.register("firstName")}
-              />
-              {form.formState.errors.firstName && (
-                <p className="text-red-400 text-xs mt-1">
-                  {form.formState.errors.firstName.message}
-                </p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="last-name" className="form-label">
-                Last Name
-              </label>
-              <input
-                type="text"
-                id="last-name"
-                className="form-input"
-                placeholder="Enter your last name"
-                {...form.register("lastName")}
-              />
-              {form.formState.errors.lastName && (
-                <p className="text-red-400 text-xs mt-1">
-                  {form.formState.errors.lastName.message}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
+            <FormField
+              name="firstName"
+              label="First Name"
+              placeholder="Enter your first name"
+              required
+              validation={validationRules.name}
+            />
 
-        <div className="card p-6 mb-8">
-          <h2 className="text-xl font-medium mb-4 border-b border-custom pb-3">
-            Contact & Location
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="country" className="form-label">
-                Country
-              </label>
-              <select
-                id="country"
-                className="form-select"
-                {...form.register("country")}
-              >
-                <option value="" disabled>
-                  Select your country
-                </option>
-                <option value="us">United States</option>
-                <option value="ca">Canada</option>
-                <option value="uk">United Kingdom</option>
-                <option value="de">Germany</option>
-                <option value="fr">France</option>
-                <option value="es">Spain</option>
-                <option value="it">Italy</option>
-                <option value="mx">Mexico</option>
-                <option value="br">Brazil</option>
-                <option value="ar">Argentina</option>
-                <option value="co">Colombia</option>
-                <option value="pe">Peru</option>
-                <option value="cl">Chile</option>
-              </select>
-              {form.formState.errors.country && (
-                <p className="text-red-400 text-xs mt-1">
-                  {form.formState.errors.country.message}
-                </p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="phone" className="form-label">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                id="phone"
-                className="form-input"
-                placeholder="Enter your phone number"
-                {...form.register("phoneNumber")}
-              />
-              {form.formState.errors.phoneNumber && (
-                <p className="text-red-400 text-xs mt-1">
-                  {form.formState.errors.phoneNumber.message}
-                </p>
-              )}
-            </div>
+            <FormField
+              name="lastName"
+              label="Last Name"
+              placeholder="Enter your last name"
+              required
+              validation={validationRules.name}
+            />
           </div>
-        </div>
 
-        <div className="card p-6 mb-8">
-          <h2 className="text-xl font-medium mb-4 border-b border-custom pb-3">
-            Wallet Details
-          </h2>
-          <div>
-            <label htmlFor="wallet-address" className="form-label">
-              Wallet Address
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                id="wallet-address"
-                className="form-input bg-dark-tertiary opacity-70"
-                value={walletAddress || form.getValues("walletAddress") || ""}
-                readOnly
-                disabled
-              />
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400">
-                <i className="fas fa-lock"></i>
-              </div>
-            </div>
-            <p className="text-xs text-gray-400 mt-1">
-              Your wallet address cannot be edited and is linked to your
-              account.
-            </p>
-          </div>
-        </div>
+          <SelectField
+            name="country"
+            label="Country"
+            required
+            options={countries}
+            placeholder="Select your country"
+          />
 
-        <div className="flex justify-center mt-8">
-          <button
-            type="submit"
-            className="btn-primary px-8 py-3 text-base"
-            disabled={saving}
-          >
-            {saving ? (
-              <>
-                <div className="loader mr-2"></div>
-                Saving...
-              </>
-            ) : (
-              <>
-                <i className="fas fa-save mr-2"></i>
-                Save Changes
-              </>
-            )}
-          </button>
-        </div>
-      </form>
+          <FormField
+            name="phoneNumber"
+            label="Phone Number"
+            type="tel"
+            placeholder="+1 (555) 000-0000"
+            validation={{
+              pattern: /^[\+]?[1-9][\d]{0,15}$/,
+              custom: async (value: string) => {
+                if (value && value.length < 10) {
+                  return "Phone number must be at least 10 digits";
+                }
+                return undefined;
+              },
+            }}
+            description="Optional: Used for important notifications"
+          />
+
+          <AddressField
+            name="walletAddress"
+            label="Stellar Wallet Address"
+            addressType="stellar"
+            showCopyButton
+            showExplorerLink
+            formatDisplay
+            required
+            disabled
+            description="Your connected wallet address (read-only)"
+          />
+        </EnhancedForm>
+      </div>
     </main>
   );
 }

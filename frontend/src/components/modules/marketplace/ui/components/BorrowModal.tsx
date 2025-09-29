@@ -148,7 +148,7 @@ export function BorrowModal({ isOpen, onClose, poolId }: BorrowModalProps) {
                 }
               >
                 {alert.includes('CRITICAL') ? (
-                  <ExclamationTriangle className="h-4 w-4" />
+                  <AlertTriangle className="h-4 w-4" />
                 ) : (
                   <Info className="h-4 w-4" />
                 )}
@@ -242,9 +242,9 @@ export function BorrowModal({ isOpen, onClose, poolId }: BorrowModalProps) {
                   {healthFactor?.riskLevel === 'safe' ? (
                     <CheckCircle className="h-4 w-4 text-green-500" />
                   ) : healthFactor?.riskLevel === 'warning' ? (
-                    <ExclamationTriangle className="h-4 w-4 text-yellow-500" />
+                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
                   ) : (
-                    <ExclamationTriangle className="h-4 w-4 text-red-500" />
+                    <AlertTriangle className="h-4 w-4 text-red-500" />
                   )}
                 </div>
               </div>
@@ -279,7 +279,7 @@ export function BorrowModal({ isOpen, onClose, poolId }: BorrowModalProps) {
               </div>
               <div className="bg-neutral-800/50 border border-neutral-700 rounded p-3">
                 <div className="flex items-center gap-1 mb-1">
-                  <ExclamationTriangle className="text-red-400 h-3 w-3" />
+                  <AlertTriangle className="text-red-400 h-3 w-3" />
                   <span className="text-xs text-neutral-400">Liquidation Price</span>
                 </div>
                 <div className="text-sm font-semibold text-white">

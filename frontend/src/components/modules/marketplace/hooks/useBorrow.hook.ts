@@ -25,7 +25,8 @@ export function useBorrow({ isOpen, onClose, poolId }: UseBorrowProps) {
     liquidationThreshold: 75,
   });
 
-  // Real-time calculations as user types
+  // Real-time calculations as user types (primarily for legacy usage and baseline estimates)
+  // Note: Enhanced form components handle their own validation and real-time feedback
   useEffect(() => {
     if (borrowAmount && Number(borrowAmount) > 0) {
       const amount = Number(borrowAmount);
@@ -48,13 +49,19 @@ export function useBorrow({ isOpen, onClose, poolId }: UseBorrowProps) {
     }
   }, [borrowAmount]);
 
-  const handleBorrow = async () => {
+  const handleBorrow = async (payload?: {
+    amount: string;
+    slippageTolerance: number; // Currently accepted but not implemented in transaction logic
+  }) => {
     if (!walletAddress) {
       toast.error("Please connect your wallet first");
       return;
     }
 
-    if (!borrowAmount || Number(borrowAmount) <= 0) {
+    // Use payload amount if provided, otherwise fall back to borrowAmount state
+    const amountToUse = payload?.amount || borrowAmount;
+
+    if (!amountToUse || Number(amountToUse) <= 0) {
       toast.error("Please enter a valid borrow amount");
       return;
     }
@@ -70,7 +77,7 @@ export function useBorrow({ isOpen, onClose, poolId }: UseBorrowProps) {
 
     try {
       // Convert UI amount to contract format (USDC has 7 decimals on Stellar)
-      const amountInt = BigInt(Number(borrowAmount) * 1e7);
+      const amountInt = BigInt(Number(amountToUse) * 1e7);
 
       toast.info("Creating borrow transaction...");
 
@@ -146,11 +153,11 @@ export function useBorrow({ isOpen, onClose, poolId }: UseBorrowProps) {
           const txResult = await server.getTransaction(result.hash);
 
           if (txResult.status === "SUCCESS") {
-            toast.success(`Successfully borrowed ${borrowAmount} USDC!`);
+            toast.success(`Successfully borrowed ${amountToUse} USDC!`);
 
             // Log transaction details
             console.log("Borrow transaction completed:", {
-              amount: borrowAmount,
+              amount: amountToUse,
               asset: "USDC",
               poolId: poolId,
               healthFactor: estimates.healthFactor,
@@ -232,14 +239,8 @@ export function useBorrow({ isOpen, onClose, poolId }: UseBorrowProps) {
   const isDangerous =
     estimates.healthFactor < 1.0 && estimates.healthFactor > 0;
 
-  // Check if borrow button should be disabled
-  const isBorrowDisabled =
-    loading ||
-    !borrowAmount ||
-    Number(borrowAmount) <= 0 ||
-    !walletAddress ||
-    !poolId ||
-    (estimates.healthFactor > 0 && estimates.healthFactor < 1.0);
+  // Check if borrow should be disabled (for legacy usage - enhanced form handles its own validation)
+  const isBorrowDisabled = loading || !walletAddress || !poolId;
 
   return {
     // State

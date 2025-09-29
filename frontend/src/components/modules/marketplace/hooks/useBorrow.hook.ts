@@ -61,7 +61,8 @@ export function useBorrow({ isOpen, onClose, poolId }: UseBorrowProps) {
     // Use payload amount if provided, otherwise fall back to borrowAmount state
     const amountToUse = payload?.amount || borrowAmount;
 
-    if (!amountToUse || Number(amountToUse) <= 0) {
+    const n = Number(amountToUse);
+    if (!amountToUse?.trim() || !Number.isFinite(n) || n <= 0) {
       toast.error("Please enter a valid borrow amount");
       return;
     }

@@ -76,8 +76,14 @@ export function useBorrow({ isOpen, onClose, poolId }: UseBorrowProps) {
     setLoading(true);
 
     try {
+      // Safe decimal-string -> scaled BigInt conversion
+      const toScaledBigInt = (amount: string, decimals: number): bigint => {
+        const [whole, frac = ""] = amount.trim().split(".");
+        const fracPadded = (frac + "0".repeat(decimals)).slice(0, decimals);
+        return BigInt(whole || "0") * BigInt(10) ** BigInt(decimals) + BigInt(fracPadded || "0");
+      };
       // Convert UI amount to contract format (USDC has 7 decimals on Stellar)
-      const amountInt = BigInt(Number(amountToUse) * 1e7);
+      const amountInt = toScaledBigInt(amountToUse, 7);
 
       toast.info("Creating borrow transaction...");
 

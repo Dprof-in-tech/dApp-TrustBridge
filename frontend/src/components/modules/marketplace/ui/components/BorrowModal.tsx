@@ -90,7 +90,7 @@ export function BorrowModal({ isOpen, onClose, poolId }: BorrowModalProps) {
     return newHealthFactor;
   };
 
-  if (!isOpen) return null;
+  // Always call useEffect hook before any conditional returns
   useEffect(() => {
     if (!isOpen || !walletAddress) return;
 
@@ -117,6 +117,9 @@ export function BorrowModal({ isOpen, onClose, poolId }: BorrowModalProps) {
 
     return stopMonitoring;
   }, [isOpen, walletAddress]);
+
+  // Use conditional rendering instead of early return
+  if (!isOpen) return null;
 
   return (
     <div

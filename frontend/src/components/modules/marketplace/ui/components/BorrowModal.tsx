@@ -10,10 +10,11 @@ import {
   type HealthFactorResult 
 } from "@/helpers/health-factor.helper";
 import { useWalletContext } from "@/providers/wallet.provider";
-import { EnhancedForm, NumberInput } from "@/components/ui/form";
+import { EnhancedForm } from "@/components/ui/form/EnhancedForm";
+import { NumberInput } from "@/components/ui/form/NumberInput";
 import { AmountField } from "@/components/ui/form-field";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { X, ArrowDown, ExclamationTriangle, Info, CheckCircle, Shield } from "lucide-react";
+import { X, ArrowDown, AlertTriangle, Info, CheckCircle, Shield } from "lucide-react";
 
 interface PoolReserve {
   symbol: string;
@@ -173,9 +174,8 @@ export function BorrowModal({ isOpen, onClose, poolId }: BorrowModalProps) {
             min={0.01}
             precision={6}
             showMaxButton
-            maxValue={maxBorrowable}
-            showQuickAmounts
-            quickAmounts={[100, 500, 1000, 2500]}
+            balance={maxBorrowable}
+            showQuickButtons={[100, 500, 1000, 2500]}
             required
             disabled={loading}
             validation={{
@@ -217,12 +217,15 @@ export function BorrowModal({ isOpen, onClose, poolId }: BorrowModalProps) {
             suffix="%"
             validation={{
               required: "Slippage tolerance is required",
-              custom: async (value) => {
+              custom: async (value: any) => {
                 const num = parseFloat(value);
                 if (num > 3) return "High slippage may result in poor execution";
                 return undefined;
               }
             }}
+          />
+        </EnhancedForm>
+
         {/* Transaction Preview */}
         {borrowAmount && Number(borrowAmount) > 0 && (
           <div className="mt-6 border-t border-neutral-700 pt-4">
@@ -254,7 +257,7 @@ export function BorrowModal({ isOpen, onClose, poolId }: BorrowModalProps) {
                     : "text-red-400"
                 }`}
               >
-                {healthFactor?.factor.toFixed(2) || estimates.healthFactor.toFixed(2)}
+                {healthFactor?.healthFactor || estimates.healthFactor.toFixed(2)}
               </div>
               <p className="text-xs text-gray-500 mt-1">
                 {healthFactor?.riskLevel === 'safe' && "Your position is healthy"}

@@ -11,6 +11,9 @@ import {
 } from "@/config/contracts";
 import { signTransaction } from "@/components/modules/auth/helpers/stellar-wallet-kit.helper";
 import { toast } from "sonner";
+import { EnhancedForm } from "@/components/ui/form";
+import { AmountField, SelectField } from "@/components/ui/form-field";
+import { X, Plus, Info, ArrowRight, Percent, TrendingUp } from "lucide-react";
 
 // Import Blend SDK and Stellar SDK
 import { PoolContractV2, RequestType } from "@blend-capital/blend-sdk";
@@ -321,14 +324,34 @@ export function ProvideLiquidityModal({
     Number(depositAmount) <= Number(balancesFormatted[selectedAsset] ?? "0");
   const hasEstimates = isValidAmount && estimates.bTokensEstimated > 0;
 
+  const handleFormSubmit = async (data: any) => {
+    const { asset, amount } = data;
+    setSelectedAsset(asset);
+    setDepositAmount(amount);
+    
+    // Handle liquidity provision
+    await handleDeposit();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      onClose();
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      onKeyDown={handleKeyDown}
+    >
       <div className="card bg-dark-secondary p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
-            <i className="fas fa-coins text-success text-xl"></i>
+            <div className="p-2 bg-blue-900/30 rounded-lg">
+              <Plus className="text-blue-400 h-5 w-5" />
+            </div>
             <div>
               <h3 className="text-xl font-semibold text-white">
                 Provide Liquidity
@@ -339,33 +362,122 @@ export function ProvideLiquidityModal({
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">
-            <i className="fas fa-times"></i>
+          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+            <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="space-y-4">
-          {/* Asset Selection */}
-          <div>
-            <label className="form-label">Asset</label>
-            <div className="grid grid-cols-3 gap-2">
-              {availableAssets.map((asset) => (
-                <button
-                  key={asset.symbol}
-                  className={`btn-secondary text-xs ${selectedAsset === asset.symbol ? "btn-primary" : ""}`}
-                  onClick={() => setSelectedAsset(asset.symbol)}
-                >
-                  {asset.symbol}
-                </button>
-              ))}
+        {/* Enhanced Form */}
+        <EnhancedForm
+          onSubmit={handleFormSubmit}
+          submitText="Provide Liquidity"
+          loadingText="Processing Transaction..."
+          showProgress
+          disabled={loading || loadingBalances}
+        >
+          <SelectField
+            name="asset"
+            label="Select Asset"
+            required
+            options={availableAssets.map(asset => ({
+              value: asset.symbol,
+              label: asset.symbol,
+              description: `APY: ${asset.apy}% | Balance: ${balancesFormatted[asset.symbol] || '0'} ${asset.symbol}`,
+              icon: <span className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-green-500 flex items-center justify-center text-white text-xs font-bold">{asset.symbol[0]}</span>
+            }))}
+            placeholder="Choose an asset to provide"
+            onValueChange={(value) => setSelectedAsset(value)}
+          />
+
+          <AmountField
+            name="amount"
+            label="Deposit Amount"
+            asset={selectedAsset}
+            balance={balancesFormatted[selectedAsset] ? parseFloat(balancesFormatted[selectedAsset]) : undefined}
+            min={0.01}
+            precision={6}
+            showMaxButton
+            showQuickAmounts
+            quickAmounts={[25, 50, 75]}
+            required
+            disabled={loading || loadingBalances}
+            validation={{
+              required: "Please enter an amount to deposit",
+              custom: async (value: string) => {
+                const amount = parseFloat(value);
+                const balance = balancesFormatted[selectedAsset] ? parseFloat(balancesFormatted[selectedAsset]) : 0;
+                
+                if (amount < 0.01) return "Minimum deposit amount is 0.01";
+                if (amount > balance) {
+                  return `Insufficient ${selectedAsset} balance`;
+                }
+                return undefined;
+              }
+            }}
+          />
+        </EnhancedForm>
+
+        {/* Transaction Preview */}
+        {hasEstimates && (
+          <div className="mt-6 border-t border-neutral-700 pt-4">
+            <h4 className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
+              <ArrowRight className="h-4 w-4" />
+              Transaction Preview
+            </h4>
+
+            {/* You Will Receive */}
+            <div className="bg-neutral-800 border border-neutral-700 rounded-lg p-4 mb-3">
+              <div className="flex justify-between mb-1">
+                <span className="text-sm text-neutral-400">You will receive</span>
+                <span className="text-xs text-blue-300 bg-blue-900/30 border border-blue-700 px-2 py-1 rounded">
+                  b{selectedAsset} Tokens
+                </span>
+              </div>
+              <div className="text-xl font-bold text-blue-400">
+                ~{estimates.bTokensEstimated.toFixed(6)}
+              </div>
+              <p className="text-xs text-neutral-500 mt-1">
+                Receipt tokens representing your pool share
+              </p>
+            </div>
+
+            {/* Pool Stats */}
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div className="bg-neutral-800/50 border border-neutral-700 rounded p-3">
+                <div className="flex items-center gap-1 mb-1">
+                  <Percent className="text-green-400 h-3 w-3" />
+                  <span className="text-xs text-neutral-400">Supply APY</span>
+                </div>
+                <div className="text-sm font-semibold text-green-400">
+                  {estimates.supplyAPY}%
+                </div>
+              </div>
+              <div className="bg-neutral-800/50 border border-neutral-700 rounded p-3">
+                <div className="flex items-center gap-1 mb-1">
+                  <TrendingUp className="text-blue-400 h-3 w-3" />
+                  <span className="text-xs text-neutral-400">New Health Factor</span>
+                </div>
+                <div className="text-sm font-semibold text-blue-400">
+                  {estimates.newHealthFactor.toFixed(2)}
+                </div>
+              </div>
             </div>
           </div>
+        )}
 
-          {/* Wallet Balance */}
-          <div className="card p-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <i className="fas fa-shield text-gray-400"></i>
+        {/* Info Alert */}
+        <div className="mt-6 bg-blue-900/20 border border-blue-700/50 text-blue-300 text-sm rounded p-3">
+          <div className="flex items-start gap-2">
+            <Info className="text-blue-400 h-4 w-4 mt-0.5 shrink-0" />
+            <p>
+              <strong>About bTokens:</strong> These tokens automatically earn yield and represent your share of the pool. You can redeem them anytime for the underlying asset plus accrued interest.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
                 <span className="text-sm text-gray-400">Wallet Balance</span>
               </div>
               <div className="text-right">

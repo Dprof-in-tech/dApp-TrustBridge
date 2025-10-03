@@ -1,6 +1,9 @@
 "use client";
 
 import { useSupplyCollateral } from "../../hooks/useSupplyCollateral.hook";
+import { EnhancedForm } from "@/components/ui/form/EnhancedForm";
+import { AmountField } from "@/components/ui/form-field/AmountField";
+import { validationRules } from "@/lib/validation";
 
 interface SupplyXLMCollateralModalProps {
   isOpen: boolean;
@@ -49,37 +52,18 @@ export function SupplyXLMCollateralModal({
 
         <div className="space-y-4">
           {/* Amount Input */}
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <label className="form-label">Amount to Supply</label>
-              <span className="text-xs text-gray-400 bg-dark-tertiary px-2 py-1 rounded">
-                XLM
-              </span>
-            </div>
-            <input
-              type="number"
-              className="form-input text-lg h-12"
-              placeholder="0.00"
-              value={collateralAmount}
-              onChange={(e) => setCollateralAmount(e.target.value)}
-              min="0"
-              step="0.01"
-              disabled={loading}
-            />
-            {/* Quick Amount Buttons */}
-            <div className="flex gap-2 mt-2">
-              {[100, 500, 1000, 5000].map((amount) => (
-                <button
-                  key={amount}
-                  className="btn-secondary text-xs flex-1"
-                  onClick={() => setCollateralAmount(amount.toString())}
-                  disabled={loading}
-                >
-                  {amount}
-                </button>
-              ))}
-            </div>
-          </div>
+          <AmountField
+            name="amount"
+            label="Amount to Supply"
+            asset="XLM"
+            value={collateralAmount}
+            onValueChange={setCollateralAmount}
+            required
+            validation={validationRules.amount}
+            showQuickButtons={[100, 500, 1000, 5000]}
+            placeholder="0.00"
+            disabled={loading}
+          />
 
           {/* Transaction Preview */}
           {estimates.borrowingPower > 0 && (

@@ -1,0 +1,129 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "close": "Cerrar",
+    "connect": "Conectar",
+    "disconnect": "Desconectar",
+    "amount": "Cantidad",
+    "submit": "Enviar",
+    "manage": "Gestionar"
+  },
+  "navigation": {
+    "dashboard": "Panel",
+    "marketplace": "Mercado",
+    "profile": "Perfil",
+    "logout": "Cerrar Sesión"
+  },
+  "header": {
+    "connectWallet": "Conectar Billetera",
+    "disconnect": "Desconectar",
+    "stellarTestnet": "Stellar Testnet"
+  },
+  "dashboard": {
+    "title": "Bienvenido de vuelta, {{address}}",
+    "subtitle": "Revisa tus posiciones y actividad en un solo lugar",
+    "totalSupplied": "Total Suministrado",
+    "totalBorrowed": "Total Prestado",
+    "availableBalance": "Balance Disponible",
+    "activeLoans": "Préstamos Activos",
+    "recentActivity": "Actividad Reciente",
+    "activityChartLoading": "Gráfica de actividad cargando...",
+    "currentPositions": "Posiciones Actuales",
+    "asset": "Activo",
+    "quantity": "Cantidad",
+    "apy": "APY",
+    "collateral": "Colateral",
+    "status": "Estado",
+    "action": "Acción",
+    "active": "Activo",
+    "collateralBadge": "Colateral",
+    "usdCoin": "USD Coin",
+    "stellarLumens": "Stellar Lumens"
+  },
+  "marketplace": {
+    "title": "Mercado",
+    "description": "Pools de préstamos descentralizados impulsados por Blend Protocol",
+    "totalSupplied": "Total Suministrado",
+    "totalBorrowed": "Total Prestado",
+    "utilizationRate": "Tasa de Utilización",
+    "optimal": "Óptimo",
+    "optimalRange": "Rango óptimo: 50-80%",
+    "pool": "Pool",
+    "oracle": "Oráculo",
+    "maxPositions": "Posiciones Máx",
+    "backstopRate": "Tasa Backstop",
+    "supplyAndBorrow": "Suministro y Préstamo",
+    "analytics": "Análisis",
+    "history": "Historial",
+    "asset": "Activo",
+    "supplied": "Suministrado",
+    "borrowed": "Prestado",
+    "supplyAPY": "APY Suministro",
+    "borrowAPY": "APY Préstamo",
+    "role": "Rol",
+    "reserve": "Reserva {{number}}",
+    "usdCoin": "USD Coin",
+    "stellarLumens": "Stellar Lumens",
+    "trustBridgeToken": "Token TrustBridge",
+    "deployPool": "Desplegar Pool",
+    "deploying": "Desplegando...",
+    "quickSupply": "Suministro Rápido",
+    "supplying": "Suministrando...",
+    "supplyUSDC": "Suministrar USDC",
+    "supplyXLMCollateral": "Suministrar Colateral XLM",
+    "provideLiquidity": "Proveer Liquidez",
+    "borrowUSDC": "Pedir Prestado USDC",
+    "connectWalletAlert": {
+      "title": "Conecta Tu Billetera",
+      "message": "Por favor conecta tu billetera Stellar para interactuar con los pools de préstamos."
+    },
+    "poolReadyAlert": {
+      "title": "Pool Listo para Préstamos",
+      "message": "¡Pool desplegado exitosamente! Ahora puedes suministrar USDC para proveer liquidez y los usuarios pueden pedir prestado del pool. El pool está configurado con reservas USDC y listo para operar."
+    }
+  },
+  "profile": {
+    "title": "Perfil",
+    "subtitle": "Administra la información de tu perfil"
+  },
+  "transactions": {
+    "pending": "Transacción Pendiente",
+    "confirmed": "Transacción Confirmada",
+    "failed": "Transacción Fallida",
+    "submitting": "Enviando Transacción..."
+  },
+  "amounts": {
+    "currency": "${{amount}}",
+    "percentage": "{{value}}%",
+    "tokens": "{{amount}} {{symbol}}"
+  },
+  "errors": {
+    "walletNotConnected": "Billetera no conectada",
+    "insufficientBalance": "Balance insuficiente",
+    "transactionFailed": "Transacción fallida",
+    "networkError": "Error de red"
+  },
+  "modals": {
+    "borrow": {
+      "title": "Pedir Prestado USDC",
+      "description": "Pide prestado USDC del pool"
+    },
+    "supply": {
+      "title": "Suministrar USDC",
+      "description": "Suministra USDC al pool"
+    },
+    "supplyCollateral": {
+      "title": "Suministrar Colateral XLM",
+      "description": "Suministra XLM como colateral"
+    },
+    "provideLiquidity": {
+      "title": "Proveer Liquidez",
+      "description": "Provee liquidez al pool"
+    }
+  }
+}
+

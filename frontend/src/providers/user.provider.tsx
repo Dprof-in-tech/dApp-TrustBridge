@@ -1,106 +1,105 @@
-"use client";
+"use client"
 
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { db, doc, getDoc, setDoc } from "@/lib/firebase";
-import { UserProfile, UserProfileFormData } from "@/@types/user.entity";
-import { useWalletContext } from "@/providers/wallet.provider";
-import { toast } from "sonner";
+import type React from "react"
+import { createContext, useContext, useState, useEffect } from "react"
+import { db, doc, getDoc, setDoc } from "@/lib/firebase"
+import type { UserProfile, UserProfileFormData } from "@/@types/user.entity"
+import { useWalletContext } from "@/providers/wallet.provider"
+import { toast } from "sonner"
 
 interface UserContextType {
-  profile: UserProfile | null;
-  loading: boolean;
-  saving: boolean;
-  saveProfile: (data: UserProfileFormData) => Promise<void>;
+  profile: UserProfile | null
+  loading: boolean
+  saving: boolean
+  saveProfile: (data: UserProfileFormData) => Promise<void>
 }
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
+const UserContext = createContext<UserContextType | undefined>(undefined)
 
-export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const { walletAddress, updateDisplayName } = useWalletContext();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { walletAddress, updateDisplayName } = useWalletContext()
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     if (walletAddress) {
-      loadProfile();
+      loadProfile()
     } else {
-      setProfile(null);
-      setLoading(false);
+      setProfile(null)
+      setLoading(false)
     }
-  }, [walletAddress]);
+  }, [walletAddress])
 
   const loadProfile = async () => {
-    if (!walletAddress || !db) return;
+    if (!walletAddress || !db) return
 
     try {
-      setLoading(true);
-      const userDoc = await getDoc(doc(db, "users", walletAddress));
+      setLoading(true)
+      const userDoc = await getDoc(doc(db, "users", walletAddress))
 
       if (userDoc.exists()) {
-        const userData = userDoc.data() as UserProfile;
-        setProfile(userData);
-        
+        const userData = userDoc.data() as UserProfile
+        setProfile(userData)
+
         // Update display name if profile has name information
         if (userData.firstName || userData.lastName) {
-          const displayName = `${userData.firstName} ${userData.lastName}`.trim();
+          const displayName = `${userData.firstName} ${userData.lastName}`.trim()
           if (displayName) {
-            updateDisplayName(displayName);
+            updateDisplayName(displayName)
           }
         }
       } else {
-        setProfile(null);
+        setProfile(null)
       }
     } catch (error) {
-      console.error("Error loading user profile:", error);
-      toast.error("Failed to load profile");
+      console.error("Error loading user profile:", error)
+      toast.error("Failed to load profile")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const saveProfile = async (data: UserProfileFormData) => {
     if (!walletAddress) {
-      toast.error("Please connect your wallet first");
-      return;
+      toast.error("Please connect your wallet first")
+      return
     }
 
     if (!db) {
-      toast.error("Firebase is not available");
-      return;
+      toast.error("Firebase is not available")
+      return
     }
 
     try {
-      setSaving(true);
-      const now = Date.now();
+      setSaving(true)
+      const now = Date.now()
       const userData: UserProfile = {
         walletAddress,
         ...data,
         createdAt: profile?.createdAt || now,
         updatedAt: now,
-      };
+      }
 
-      await setDoc(doc(db, "users", walletAddress), userData);
-      setProfile(userData);
-      
+      await setDoc(doc(db, "users", walletAddress), userData)
+      setProfile(userData)
+
       // Update display name in wallet context
       if (data.firstName || data.lastName) {
-        const displayName = `${data.firstName} ${data.lastName}`.trim();
+        const displayName = `${data.firstName} ${data.lastName}`.trim()
         if (displayName) {
-          updateDisplayName(displayName);
+          updateDisplayName(displayName)
         }
       }
-      
-      toast.success("Profile saved successfully");
+
+      toast.success("Profile saved successfully")
     } catch (error) {
-      console.error("Error saving user profile:", error);
-      toast.error("Failed to save profile");
+      console.error("Error saving user profile:", error)
+      toast.error("Failed to save profile")
     } finally {
-      setSaving(false);
+      setSaving(false)
     }
-  };
+  }
 
   return (
     <UserContext.Provider
@@ -113,13 +112,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     >
       {children}
     </UserContext.Provider>
-  );
-};
+  )
+}
 
 export const useUserContext = () => {
-  const context = useContext(UserContext);
+  const context = useContext(UserContext)
   if (context === undefined) {
-    throw new Error("useUserContext must be used within a UserProvider");
+    throw new Error("useUserContext must be used within a UserProvider")
   }
-  return context;
-};
+  return context
+}

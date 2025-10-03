@@ -1,0 +1,129 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "amount": "Amount",
+    "submit": "Submit",
+    "manage": "Manage"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "marketplace": "Marketplace",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "header": {
+    "connectWallet": "Connect Wallet",
+    "disconnect": "Disconnect",
+    "stellarTestnet": "Stellar Testnet"
+  },
+  "dashboard": {
+    "title": "Welcome back, {{address}}",
+    "subtitle": "Review your positions and activity in one place",
+    "totalSupplied": "Total Supplied",
+    "totalBorrowed": "Total Borrowed",
+    "availableBalance": "Available Balance",
+    "activeLoans": "Active Loans",
+    "recentActivity": "Recent Activity",
+    "activityChartLoading": "Activity chart loading...",
+    "currentPositions": "Current Positions",
+    "asset": "Asset",
+    "quantity": "Quantity",
+    "apy": "APY",
+    "collateral": "Collateral",
+    "status": "Status",
+    "action": "Action",
+    "active": "Active",
+    "collateralBadge": "Collateral",
+    "usdCoin": "USD Coin",
+    "stellarLumens": "Stellar Lumens"
+  },
+  "marketplace": {
+    "title": "Marketplace",
+    "description": "Decentralized lending pools powered by Blend Protocol",
+    "totalSupplied": "Total Supplied",
+    "totalBorrowed": "Total Borrowed",
+    "utilizationRate": "Utilization Rate",
+    "optimal": "Optimal",
+    "optimalRange": "Optimal range: 50-80%",
+    "pool": "Pool",
+    "oracle": "Oracle",
+    "maxPositions": "Max Positions",
+    "backstopRate": "Backstop Rate",
+    "supplyAndBorrow": "Supply & Borrow",
+    "analytics": "Analytics",
+    "history": "History",
+    "asset": "Asset",
+    "supplied": "Supplied",
+    "borrowed": "Borrowed",
+    "supplyAPY": "Supply APY",
+    "borrowAPY": "Borrow APY",
+    "role": "Role",
+    "reserve": "Reserve {{number}}",
+    "usdCoin": "USD Coin",
+    "stellarLumens": "Stellar Lumens",
+    "trustBridgeToken": "TrustBridge Token",
+    "deployPool": "Deploy Pool",
+    "deploying": "Deploying...",
+    "quickSupply": "Quick Supply",
+    "supplying": "Supplying...",
+    "supplyUSDC": "Supply USDC",
+    "supplyXLMCollateral": "Supply XLM Collateral",
+    "provideLiquidity": "Provide Liquidity",
+    "borrowUSDC": "Borrow USDC",
+    "connectWalletAlert": {
+      "title": "Connect Your Wallet",
+      "message": "Please connect your Stellar wallet to interact with the lending pools."
+    },
+    "poolReadyAlert": {
+      "title": "Pool Ready for Lending",
+      "message": "Pool deployed successfully! You can now supply USDC to provide liquidity and users can borrow from the pool. The pool is configured with USDC reserves and ready for operation."
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your profile information"
+  },
+  "transactions": {
+    "pending": "Transaction Pending",
+    "confirmed": "Transaction Confirmed",
+    "failed": "Transaction Failed",
+    "submitting": "Submitting Transaction..."
+  },
+  "amounts": {
+    "currency": "${{amount}}",
+    "percentage": "{{value}}%",
+    "tokens": "{{amount}} {{symbol}}"
+  },
+  "errors": {
+    "walletNotConnected": "Wallet not connected",
+    "insufficientBalance": "Insufficient balance",
+    "transactionFailed": "Transaction failed",
+    "networkError": "Network error"
+  },
+  "modals": {
+    "borrow": {
+      "title": "Borrow USDC",
+      "description": "Borrow USDC from the pool"
+    },
+    "supply": {
+      "title": "Supply USDC",
+      "description": "Supply USDC to the pool"
+    },
+    "supplyCollateral": {
+      "title": "Supply XLM Collateral",
+      "description": "Supply XLM as collateral"
+    },
+    "provideLiquidity": {
+      "title": "Provide Liquidity",
+      "description": "Provide liquidity to the pool"
+    }
+  }
+}
+
